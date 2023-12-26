@@ -1,6 +1,5 @@
 class Solution {
  public:
-  // Similar to 0242. Valid Anagram
   bool canConstruct(string ransomNote, string magazine) {
     vector<int> count(26);
 
