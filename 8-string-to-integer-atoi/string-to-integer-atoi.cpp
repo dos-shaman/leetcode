@@ -33,7 +33,6 @@ public:
         size_t firstNonDigit = s.find_first_not_of("0123456789");
         if(firstNonDigit != std::string::npos)
             s = s.substr(0, firstNonDigit);
-        // cout << s << " " << flag << endl;
 
         if(s.length() == 0)
             return 0;
