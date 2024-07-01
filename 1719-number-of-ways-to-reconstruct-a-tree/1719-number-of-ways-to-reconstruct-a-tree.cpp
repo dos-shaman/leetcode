@@ -1,62 +1,100 @@
 class Solution {
 public:
-    int checkWays(vector<vector<int>>& P) {
-        unordered_map<int, unordered_set<int>> g;
-        for (const auto& p : P) {
-            int u = p[0], v = p[1];
-            g[u].insert(v);
-            g[v].insert(u);
+    int DFS(vector<int> &cnt, vector<vector<int>> &Sons, int node, int &res, int depth){
+        bool hasDup=false;
+        int total=0;
+        int orignDepht=depth;
+        ++depth;
+        for(auto &son:Sons[node]){
+            if(cnt[son]==cnt[node]){
+                hasDup=true;
+                ++total;
+                ++depth;
+                continue;
+            }
+           
         }
-
-        function<int(unordered_set<int>)> helper = [&](unordered_set<int> nodes) {
-            unordered_map<int, vector<int>> d;
-            int m = nodes.size() - 1;
-            for (int node : nodes) {
-                d[g[node].size()].push_back(node);
+        for(auto &son:Sons[node]){
+            if(cnt[son]==cnt[node]){
+                continue;
             }
-
-            if (d[m].empty()) return 0;
-            int root = d[m][0];
-
-            for (int node : g[root]) {
-                g[node].erase(root);
+            total+=DFS(cnt,Sons,son,res,depth);
+            if(res==0){
+                return 0;
             }
-
-            unordered_map<int, unordered_set<int>> comps;
-            unordered_set<int> seen;
-            int i = 0;
-
-            function<void(int, int)> dfs = [&](int node, int i) {
-                comps[i].insert(node);
-                seen.insert(node);
-                for (int neib : g[node]) {
-                    if (seen.find(neib) == seen.end()) dfs(neib, i);
-                }
-            };
-
-            for (int node : nodes) {
-                if (node != root && seen.find(node) == seen.end()) {
-                    dfs(node, i);
-                    ++i;
-                }
+            if(res==2){
+                hasDup=true;
             }
-
-            vector<int> cands;
-            for (int j = 0; j < i; ++j) {
-                cands.push_back(helper(comps[j]));
-            }
-
-            if (find(cands.begin(), cands.end(), 0) != cands.end()) return 0;
-            if (find(cands.begin(), cands.end(), 2) != cands.end()) return 2;
-            if (d[m].size() >= 2) return 2;
-            return 1;
-        };
-
-        unordered_set<int> nodes;
-        for (const auto& kv : g) {
-            nodes.insert(kv.first);
         }
-
-        return helper(nodes);
+        if(total+orignDepht !=cnt[node]){
+            res=0;
+        }else if(hasDup){
+            res=2;
+        }else{
+            res=1;
+        }
+        return total+1;
+    }
+    int checkWays(vector<vector<int>>& pairs) {
+       
+        vector<int> cnt(501,0);
+        int n=0;
+      
+        for(auto &v:pairs){
+            cnt[v[0]]++;
+            cnt[v[1]]++;
+            n=std::max(v[1]+1,n);
+        }
+        int validNum=0;
+        for(auto &c:cnt){
+            if(c){
+                ++validNum;
+            }
+        }
+        
+        vector<int> Tree(n,-1);
+        
+        
+        for(auto &v:pairs){
+            if(cnt[v[1]]==cnt[v[0]]){
+                if(Tree[v[1]]==-1 || cnt[Tree[v[1]]]>cnt[v[0]] || Tree[v[1]]>v[0])
+                Tree[v[1]]=v[0];
+                continue;
+            }
+            if(cnt[v[1]] > cnt[v[0]] &&
+                (Tree[v[0]]==-1 || cnt[v[1]]<cnt[Tree[v[0]]] || (cnt[v[1]]==cnt[Tree[v[0]]] && v[1]<Tree[v[0]] ) )){
+                Tree[v[0]]=v[1];                                                                                                                                                                                                                                                                                                                                                                                                                         
+            }
+            if(cnt[v[0]] > cnt[v[1]] &&
+                (Tree[v[1]]==-1 || cnt[v[0]]<cnt[Tree[v[1]]] || (cnt[v[0]]==cnt[Tree[v[1]]] && v[0]<Tree[v[1]] ) )){
+                Tree[v[1]]=v[0];                                                                                                                                                                                                                                                                                                                                                                                                                         
+            }
+        }
+      
+ 
+        vector<vector<int>> Sons(n);
+      
+        int root=-1;
+        for(int i=1;i<n;i++){
+            if(cnt[i]==0){
+                continue;
+            }
+            if(Tree[i]==-1){
+                if(root!=-1){
+                    return 0;
+                }
+                root=i;
+            }else{
+              Sons[Tree[i]].push_back(i);  
+            }
+        }
+  
+        if(cnt[root]!=validNum-1){
+            return 0;
+        }
+       
+        int res=0;
+         DFS(cnt,Sons,root,res,0);
+        return res;
     }
 };
