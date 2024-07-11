@@ -1,14 +1,28 @@
 class Solution {
-    fun coinChange(coins: IntArray, amount: Int): Int {
-
-    val dp = IntArray(amount + 1) { amount + 1 }
-    dp[0] = 0
-
-    for (coin in coins) {
-        for (i in coin..amount) {
-            dp[i] = minOf(dp[i], dp[i - coin] + 1)
+public:
+    int f(int ind,vector<int>&coins,int amount,vector<vector<int>>&dp){
+        if(ind==0){
+            if((amount%coins[0])==0){
+                return amount/coins[ind];
+            }
+            else return 1e9;
         }
+      
+        if(dp[ind][amount]!=-1)return dp[ind][amount];
+        int notTake=0+f(ind-1,coins,amount,dp);
+        int take=1e9;
+        if(coins[ind]<=amount)take=1+f(ind,coins,amount-coins[ind],dp);
+
+        return dp[ind][amount]=min(take,notTake);
     }
-    return if (dp[amount] > amount) -1 else dp[amount]
+    int coinChange(vector<int>& coins, int amount) {
+        int n=coins.size();
+        vector<vector<int>>dp(coins.size(),vector<int>(amount+1,-1));
+
+        int ans= f(n-1,coins,amount,dp);
+        if(ans==1e9){
+            return -1;
+        }
+        return ans;
     }
-}
+};
