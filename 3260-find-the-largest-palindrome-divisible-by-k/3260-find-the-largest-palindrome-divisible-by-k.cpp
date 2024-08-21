@@ -1,47 +1,78 @@
 class Solution {
 public:
-  static string pal7(string& s, int n){
-        //999999=142857*7
-        // 10^x=1,3,2,6,4,5,1 (mod 7)  for x=0...6
-        const string p7[]={"", "7", "77", "5", "77", "7",
-        "", "4", "44", "6", "44","4"};
-        auto [q, r]=div(n, 12);
-        int pos=(n-1)/2;
-        copy(p7[r].begin(), p7[r].end(), s.begin()+pos);
-        return s;
-    }
-    static string largestPalindrome(int n, int k) {
-        string s=string(n, '9');
-        switch(k){
-            case 1: case 3: case 9: 
-                return s;
-            case 2: 
-                s[0]=s.back()='8';
-                return s;
-            case 4:
-                if (n<=4) return string(n, '8');
-                s[0]=s[1]=s[n-2]=s[n-1]='8';
-                return s;
-            case 8:
-                if (n<=6) return string(n, '8');
-                s[0]=s[1]=s[2]=s[n-3]=s[n-2]=s[n-1]='8';
-                return s;
-            case 5:
-                s[0]=s[n-1]='5';
-                return s;
-            case 6:
-                if (n<=2) return string(n, '6');
-                if (n&1){
-                    s[0]=s[n/2]=s[n-1]='8';
-                    return s;
-                }
-                // n&1==0
-                s[0]=s[n-1]='8';
-                s[n/2-1]=s[n/2]='7';
-                return s;
-            case 7: return pal7(s, n);
+    string largestPalindrome(int n, int k) {
+        if (k == 1) {
+            return string(n, '9');
+        } 
+        
+        else if (k == 2) {
+            if (n <= 2) {
+                return string(n, '8');
+            } else {
+                return '8' + string(n - 2, '9') + '8';
+            }
+        } 
+        
+        else if (k == 3 || k == 9) {
+            return string(n, '9');
+        } 
+        
+        else if (k == 4) {
+            if (n <= 4) {
+                return string(n, '8');
+            } else {
+                return "88" + string(n - 4, '9') + "88";
+            }
+        } 
+        
+        else if (k == 5) {
+            if (n <= 2) {
+                return string(n, '5');
+            } else {
+                return '5' + string(n - 2, '9') + '5';
+            }
+        } 
+        
+        else if (k == 6) {
+            if (n <= 2) {
+                return string(n, '6');
+            } else if (n == 3) {
+                return "888";
+            } else if (n == 4) {
+                return "8778";
+            } else if (n % 2 == 1) {
+                int l = n / 2 - 1;
+                return '8' + string(l, '9') + '8' + string(l, '9') + '8';
+            } else {
+                int l = n / 2 - 2;
+                return '8' + string(l, '9') + "77" + string(l, '9') + '8';
+            }
+        } 
+        
+        else if (k == 8) {
+            if (n <= 6) {
+                return string(n, '8');
+            } else {
+                return "888" + string(n - 6, '9') + "888";
+            }
+        } 
+        
+        else {
+            unordered_map<int, string> dic = {
+                {0, ""}, {1, "7"}, {2, "77"}, {3, "959"}, {4, "9779"}, 
+                {5, "99799"}, {6, "999999"}, {7, "9994999"},
+                {8, "99944999"}, {9, "999969999"}, {10, "9999449999"}, {11, "99999499999"}
+            };
 
+            int l = n / 12;
+            int r = n % 12; 
+            
+            string nines = "";
+            while(l--) {
+                nines += "999999";
+            }
+
+            return nines + dic[r] + nines;
         }
-        return "";
     }
 };
